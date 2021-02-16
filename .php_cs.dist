@@ -1,0 +1,119 @@
+<?php
+
+$header = '';
+
+$finder = PhpCsFixer\Finder::create()
+    ->in(__DIR__)
+    ->exclude([
+        'vendor',
+        'docker',
+        'app',
+        'www',
+    ])
+;
+
+$config = PhpCsFixer\Config::create()
+    ->setRiskyAllowed(false)
+    ->setRules([
+        '@Symfony' => true,
+        'phpdoc_no_useless_inheritdoc' => true,
+        'align_multiline_comment' => true,
+        'phpdoc_annotation_without_dot' => true,
+        'array_indentation' => true,
+        'array_syntax' => ['syntax' => 'short'],
+        'no_unused_imports' => true,
+        'php_unit_method_casing' => true,
+        'no_superfluous_phpdoc_tags' => true,
+        'no_trailing_whitespace_in_comment' => true,
+        'object_operator_without_whitespace' => true,
+        'no_trailing_comma_in_singleline_array' => true,
+        'no_trailing_whitespace' => true,
+        'no_trailing_comma_in_list_call' => true,
+        'class_definition' => true,
+        'braces' => true,
+        'cast_spaces' => true,
+        'blank_line_after_namespace' => true,
+        'blank_line_before_return' => true,
+        'phpdoc_trim' => true,
+        #'void_return' => true,
+        'unary_operator_spaces' => true,
+        'phpdoc_no_empty_return' => true,
+        'ternary_operator_spaces' => true,
+        'phpdoc_no_package' => true,
+        'trim_array_spaces' => true,
+        'switch_case_space' => true,
+        'phpdoc_no_access' => true,
+        'single_blank_line_before_namespace' => true,
+        'concat_space' => true,
+        'constant_case' => true,
+        'full_opening_tag' => true,
+        'function_typehint_space' => true,
+        'heredoc_indentation' => true,
+        'lowercase_cast' => true,
+        'lowercase_keywords' => true,
+        'magic_method_casing' => true,
+        'magic_constant_casing' => true,
+        'global_namespace_import' => true,
+        'method_separation' => true,
+        'no_empty_comment' => true,
+        'no_empty_phpdoc' => true,
+        'native_function_casing' => true,
+        'blank_line_before_statement' => true,
+        'combine_consecutive_issets' => true,
+        'combine_consecutive_unsets' => true,
+        'compact_nullable_typehint' => true,
+        'escape_implicit_backslashes' => true,
+        'explicit_indirect_variable' => true,
+        'explicit_string_variable' => true,
+        'fully_qualified_strict_types' => true,
+        'header_comment' => ['header' => $header],
+        'heredoc_to_nowdoc' => true,
+        'list_syntax' => ['syntax' => 'long'],
+        'method_chaining_indentation' => true,
+        'method_argument_space' => ['ensure_fully_multiline' => true],
+        'multiline_comment_opening_closing' => true,
+        'no_extra_blank_lines' => ['tokens' => ['break', 'continue', 'extra', 'return', 'throw', 'use', 'parenthesis_brace_block', 'square_brace_block', 'curly_brace_block']],
+        'no_null_property_initialization' => true,
+        'no_short_echo_tag' => true,
+        'no_superfluous_elseif' => true,
+        'no_unneeded_curly_braces' => true,
+        'no_unneeded_final_method' => true,
+        'no_useless_else' => true,
+        'no_useless_return' => true,
+        'ordered_class_elements' => true,
+        'ordered_imports' => true,
+        'php_unit_ordered_covers' => true,
+        'php_unit_test_class_requires_covers' => true,
+        'phpdoc_add_missing_param_annotation' => true,
+        'phpdoc_order' => true,
+        'phpdoc_types_order' => true,
+        'return_type_declaration' => ['space_before' => 'none'],
+        'semicolon_after_instruction' => true,
+        'no_empty_statement' => true,
+        'no_spaces_around_offset' => true,
+        'no_singleline_whitespace_before_semicolons' => true,
+        'multiline_whitespace_before_semicolons' => ['strategy' => 'new_line_for_chained_calls'],
+        'single_line_comment_style' => true,
+        'yoda_style' => true,
+        'no_alternative_syntax' => true,
+    ])
+    ->setFinder($finder)
+;
+
+// special handling of fabbot.io service if it's using too old PHP CS Fixer version
+if (false !== getenv('FABBOT_IO')) {
+    try {
+        PhpCsFixer\FixerFactory::create()
+            ->registerBuiltInFixers()
+            ->registerCustomFixers($config->getCustomFixers())
+            ->useRuleSet(new PhpCsFixer\RuleSet($config->getRules()));
+    } catch (PhpCsFixer\ConfigurationException\InvalidConfigurationException $e) {
+        $config->setRules([]);
+    } catch (UnexpectedValueException $e) {
+        $config->setRules([]);
+    } catch (InvalidArgumentException $e) {
+        $config->setRules([]);
+    }
+}
+
+return $config;

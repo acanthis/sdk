@@ -1,0 +1,25 @@
+FROM php:apache
+
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+
+RUN apt-get update \
+    && apt-get install -y libpq-dev mc iputils-ping \
+    && docker-php-ext-install pdo_pgsql \
+    && a2enmod rewrite
+
+RUN yes | pecl install xdebug \
+    && docker-php-ext-enable xdebug
+
+RUN echo xdebug.remote_enable=1 >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo xdebug.remote_port=9000 >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo xdebug.remote_autostart=1 >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo xdebug.remote_connect_back=1 >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo xdebug.idekey=PHPSTORM >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    #&& echo xdebug.remote_host=192.168.100.17 >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+RUN mkdir -p /etc/apache2/sites-eds \
+    && rm /etc/apache2/sites-enabled/*
+
+RUN echo "" >> /etc/apache2/apache2.conf \
+    && echo "# Include the configurations from the host machine" >> /etc/apache2/apache2.conf \
+    && echo "IncludeOptional sites-eds/*.conf" >> /etc/apache2/apache2.conf

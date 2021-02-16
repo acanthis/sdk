@@ -1,0 +1,11 @@
+FROM composer
+
+RUN apk update && apk add libpq postgresql-dev
+
+# PDO Extension
+RUN docker-php-ext-install pdo_pgsql
+
+RUN composer global require 'robmorgan/phinx'
+RUN composer global require 'fzaninotto/faker'
+
+ENTRYPOINT ["php", "/tmp/vendor/bin/phinx"]

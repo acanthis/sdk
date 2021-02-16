@@ -1,0 +1,18 @@
+FROM php:apache
+
+RUN docker-php-source extract \
+    && apt-get update \
+    && apt-get install -y libpq-dev \
+    && apt-get install -y libxml2-dev \
+    && apt-get install -y iputils-ping \
+    && apt-get install -y mc \
+    && docker-php-ext-install pdo_pgsql \
+    && a2enmod rewrite \
+    && docker-php-source delete
+
+RUN mkdir -p /etc/apache2/sites-eds \
+    && rm /etc/apache2/sites-enabled/*
+
+RUN echo "" >> /etc/apache2/apache2.conf \
+    && echo "# Include the configurations from the host machine" >> /etc/apache2/apache2.conf \
+    && echo "IncludeOptional sites-eds/*.conf" >> /etc/apache2/apache2.conf

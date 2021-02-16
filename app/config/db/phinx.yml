@@ -1,0 +1,42 @@
+paths:
+    migrations: '%%PHINX_CONFIG_DIR%%/../../migrations'
+    seeds: '%%PHINX_CONFIG_DIR%%/../../seeds'
+
+environments:
+    default_migration_table: phinxlog
+    default_database: development
+
+    production:
+        adapter: '%%PHINX_PROD_DBADAPTER%%'
+        host: '%%PHINX_PROD_DBHOST%%'
+        port: '%%PHINX_PROD_DBPORT%%'
+        name: '%%PHINX_PROD_DBNAME%%'
+        schema: '%%PHINX_PROD_DBSCHEMA%%'
+        user: '%%PHINX_PROD_DBUSER%%'
+        pass: '%%PHINX_PROD_DBPASS%%'
+        charset: '%%PHINX_PROD_DBCHARSET%%'
+        table_prefix: '%%PHINX_PROD_DBPREFIX%%'
+
+    development:
+        adapter: '%%PHINX_DEV_DBADAPTER%%'
+        host: '%%PHINX_DEV_DBHOST%%'
+        port: '%%PHINX_DEV_DBPORT%%'
+        name: '%%PHINX_DEV_DBNAME%%'
+        schema: '%%PHINX_DEV_DBSCHEMA%%'
+        user: '%%PHINX_DEV_DBUSER%%'
+        pass: '%%PHINX_DEV_DBPASS%%'
+        charset: '%%PHINX_DEV_DBCHARSET%%'
+        table_prefix: '%%PHINX_DEV_DBPREFIX%%'
+
+    testing:
+        adapter: '%%PHINX_TEST_DBADAPTER%%'
+        host: '%%PHINX_TEST_DBHOST%%'
+        port: '%%PHINX_TEST_DBPORT%%'
+        name: '%%PHINX_TEST_DBNAME%%'
+        schema: '%%PHINX_TEST_DBSCHEMA%%'
+        user: '%%PHINX_TEST_DBUSER%%'
+        pass: '%%PHINX_TEST_DBPASS%%'
+        charset: '%%PHINX_TEST_DBCHARSET%%'
+        table_prefix: '%%PHINX_TEST_DBPREFIX%%'
+
+version_order: creation

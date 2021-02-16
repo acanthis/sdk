@@ -1,0 +1,132 @@
+version: '3.4'
+
+services:
+    backend_dependency:
+        container_name: backend_dependency
+        build:
+            context: ./
+            dockerfile: docker/dockerfile-dependency
+        user: 1000:1000
+        volumes:
+            - ${ROOT_PATH}:/app
+        command: ["install", "--prefer-source", "--no-interaction"]
+
+    backend:
+        container_name: backend
+        domainname: eds.dev
+        hostname: backend
+        restart: always
+        build:
+            context: ./
+            dockerfile: docker/dockerfile-backend
+        depends_on:
+            - backend_dependency
+            - db
+        volumes:
+            - ${ROOT_PATH}:/var/www/html
+            - ${ROOT_PATH}/docker/config/apache/hosts/api:/etc/apache2/sites-eds
+    #    environment:
+    #      PHP_IDE_CONFIG: "serverName=api.eds"
+    #      XDEBUG_CONFIG: "remote_host=megatron remote_port=9001"
+        ports:
+            - '37000:80'
+        tty: true
+        stdin_open: true
+        links:
+            - 'db'
+
+    db:
+        container_name: db
+        domainname: db.eds.dev
+        hostname: db
+        restart: always
+        image: postgres:latest
+        ports:
+           - '39000:5432'
+        environment:
+            POSTGRES_DB: ${DB_NAME}
+            POSTGRES_SCHEMA: ${DB_SCHEMA}
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+    db_migrate:
+        container_name: db_migrate
+        build:
+            context: ./
+            dockerfile: docker/dockerfile-db-migrate
+        volumes:
+            - ${ROOT_PATH}/app:/app
+        command: ["migrate", "-c", "/app/config/db/phinx.yml", "-e", "${DB_ENVIRONMENT}"]
+        depends_on:
+           - db
+        links:
+           - db
+        environment:
+            PHINX_DEV_DBADAPTER: ${DB_DEV_ADAPTER}
+            PHINX_DEV_DBHOST: ${DB_DEV_HOST}
+            PHINX_DEV_DBPORT: ${DB_DEV_PORT}
+            PHINX_DEV_DBNAME: ${DB_DEV_NAME}
+            PHINX_DEV_DBSCHEMA: ${DB_DEV_SCHEMA}
+            PHINX_DEV_DBUSER: ${DB_DEV_USER}
+            PHINX_DEV_DBPASS: ${DB_DEV_PASSWORD}
+            PHINX_DEV_DBCHARSET: ${DB_DEV_CHARSET}
+            PHINX_DEV_DBPREFIX: ${DB_DEV_PREFIX}
+            PHINX_PROD_DBADAPTER: ${DB_PROD_ADAPTER}
+            PHINX_PROD_DBHOST: ${DB_PROD_HOST}
+            PHINX_PROD_DBPORT: ${DB_PROD_PORT}
+            PHINX_PROD_DBNAME: ${DB_PROD_NAME}
+            PHINX_PROD_DBSCHEMA: ${DB_PROD_SCHEMA}
+            PHINX_PROD_DBUSER: ${DB_PROD_USER}
+            PHINX_PROD_DBPASS: ${DB_PROD_PASSWORD}
+            PHINX_PROD_DBCHARSET: ${DB_PROD_CHARSET}
+            PHINX_PROD_DBPREFIX: ${DB_PROD_PREFIX}
+            PHINX_TEST_DBADAPTER: ${DB_TEST_ADAPTER}
+            PHINX_TEST_DBHOST: ${DB_TEST_HOST}
+            PHINX_TEST_DBPORT: ${DB_TEST_PORT}
+            PHINX_TEST_DBNAME: ${DB_TEST_NAME}
+            PHINX_TEST_DBSCHEMA: ${DB_TEST_SCHEMA}
+            PHINX_TEST_DBUSER: ${DB_TEST_USER}
+            PHINX_TEST_DBPASS: ${DB_TEST_PASSWORD}
+            PHINX_TEST_DBCHARSET: ${DB_TEST_CHARSET}
+            PHINX_TEST_DBPREFIX: ${DB_TEST_PREFIX}
+
+    db_fixture:
+        container_name: db_fixture
+        build:
+            context: ./
+            dockerfile: docker/dockerfile-db-migrate
+        volumes:
+            - ${ROOT_PATH}/app:/app
+        command: ["seed:run", "-c", "/app/config/db/phinx.yml", "-e", "${DB_ENVIRONMENT}"]
+        depends_on:
+            - db_migrate
+        links:
+            - db
+        environment:
+            PHINX_DEV_DBADAPTER: ${DB_DEV_ADAPTER}
+            PHINX_DEV_DBHOST: ${DB_DEV_HOST}
+            PHINX_DEV_DBPORT: ${DB_DEV_PORT}
+            PHINX_DEV_DBNAME: ${DB_DEV_NAME}
+            PHINX_DEV_DBSCHEMA: ${DB_DEV_SCHEMA}
+            PHINX_DEV_DBUSER: ${DB_DEV_USER}
+            PHINX_DEV_DBPASS: ${DB_DEV_PASSWORD}
+            PHINX_DEV_DBCHARSET: ${DB_DEV_CHARSET}
+            PHINX_DEV_DBPREFIX: ${DB_DEV_PREFIX}
+            PHINX_PROD_DBADAPTER: ${DB_PROD_ADAPTER}
+            PHINX_PROD_DBHOST: ${DB_PROD_HOST}
+            PHINX_PROD_DBPORT: ${DB_PROD_PORT}
+            PHINX_PROD_DBNAME: ${DB_PROD_NAME}
+            PHINX_PROD_DBSCHEMA: ${DB_PROD_SCHEMA}
+            PHINX_PROD_DBUSER: ${DB_PROD_USER}
+            PHINX_PROD_DBPASS: ${DB_PROD_PASSWORD}
+            PHINX_PROD_DBCHARSET: ${DB_PROD_CHARSET}
+            PHINX_PROD_DBPREFIX: ${DB_PROD_PREFIX}
+            PHINX_TEST_DBADAPTER: ${DB_TEST_ADAPTER}
+            PHINX_TEST_DBHOST: ${DB_TEST_HOST}
+            PHINX_TEST_DBPORT: ${DB_TEST_PORT}
+            PHINX_TEST_DBNAME: ${DB_TEST_NAME}
+            PHINX_TEST_DBSCHEMA: ${DB_TEST_SCHEMA}
+            PHINX_TEST_DBUSER: ${DB_TEST_USER}
+            PHINX_TEST_DBPASS: ${DB_TEST_PASSWORD}
+            PHINX_TEST_DBCHARSET: ${DB_TEST_CHARSET}
+            PHINX_TEST_DBPREFIX: ${DB_TEST_PREFIX}

@@ -1,0 +1,17 @@
+FROM composer
+
+RUN docker-php-ext-install \
+        bcmath \
+        json \
+        pdo
+
+RUN adduser -D -u 1000 develop
+USER develop
+
+RUN mkdir /home/develop/.ssh/
+COPY docker/config/secrets/deploy_key  /home/develop/.ssh/id_rsa
+RUN ssh-keyscan -T 60 bitbucket.org >> /home/develop/.ssh/known_hosts
+
+WORKDIR /app
+
+CMD ["composer"]
